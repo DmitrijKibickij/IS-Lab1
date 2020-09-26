@@ -1,5 +1,8 @@
 %Classification using perceptron
 
+%SELECT 5-7 IMAGES OF PEARS AND APPLES!!!!!
+% T: use T=1 pears and T=-1 for apples!!!!
+
 %Reading apple images
 A1=imread('apple_04.jpg');
 A2=imread('apple_05.jpg');
@@ -57,10 +60,11 @@ metric_P2=apvalumas_roundness(P2); %roundness
 %3rd pear image(P3)
 hsv_value_P3=spalva_color(P3); %color
 metric_P3=apvalumas_roundness(P3); %roundness
-%2nd pear image(P4)
+%4th pear image(P4)
 hsv_value_P4=spalva_color(P4); %color
 metric_P4=apvalumas_roundness(P4); %roundness
 
+%1
 %selecting features(color, roundness, 3 apples and 2 pears)
 %A1,A2,A3,P1,P2
 %building matrix 2x5
@@ -69,11 +73,16 @@ x2=[metric_A1 metric_A2 metric_A3 metric_P1 metric_P2];
 % estimated features are stored in matrix P:
 P=[x1;x2];
 
+%2
+z1=[hsv_value_A4 hsv_value_A5 hsv_value_A6 hsv_value_P3 hsv_value_P4];
+z2=[metric_A4 metric_A5 metric_A6 metric_P3 metric_P4];
+P2=[z1;z2];
+
 %Desired output vector
-T=[1;-1;-1;1;-1];
+T=[1;1;1;-1;-1];
 
 %Learning rate(initial)
-nu=0.2; 
+eta=0.2; 
 
 %% train single perceptron with two inputs and one output
 
@@ -82,7 +91,7 @@ w1 = randn(1);
 w2 = randn(1);
 b = randn(1);
 % calculate weighted sum with randomly generated parameters
-v1 = x1*w1+x2*w2+b; % write your code here
+v1 = x1(1,1)*w1+x2(1,1)*w2+b; % write your code here
 disp(v1);
 % calculate current output of the perceptron 
 if v1 > 0
@@ -95,7 +104,7 @@ e1 = T(1) - y;
 disp(e1);
 % repeat the same for the rest 4 inputs x1 and x2
 % calculate weighted sum with randomly generated parameters
-v2 = x1*w1+x2*w2+b; % write your code here
+v2 = x1(1,2)*w1+x2(1,2)*w2+b; % write your code here
 disp(v2);
 % calculate current output of the perceptron 
 if v2 > 0
@@ -107,8 +116,7 @@ end
 e2 = T(2) - y;
 disp(e2);
 % <...> write the code for another 3 inputs
-%v3=((x1(1,3)*w1+x2(1,3)*w2)/(w1+w2))+b;
-v3=x1*w1+x2*w2+b;
+v3=x1(1,3)*w1+x2(1,3)*w2+b;
 disp(v3);
 if v3 > 0
     y = 1;
@@ -118,7 +126,7 @@ end
 e3=T(3)-y;
 disp(e3);
 
-v4=x1*w1+x2*w2+b;
+v4=x1(1,4)*w1+x2(1,4)*w2+b;
 disp(v4);
 if v4 > 0
     y = 1;
@@ -128,7 +136,7 @@ end
 e4=T(4)-y;
 disp(e4);
 
-v5=x1*w1+x2*w2+b;
+v5=x1(1,5)*w1+x2(1,5)*w2+b;
 disp(v5);
 if v5 > 0
     y = 1;
@@ -141,41 +149,69 @@ disp(e5);
 e = abs(e1) + abs(e2) + abs(e3) + abs(e4) + abs(e5);
 disp(e);
 
-% write training algorithm
+% write training algorithm(no random selection inside loop)
 while e ~= 0 % executes while the total error is not 0
 	% here should be your code of parameter update
-    for n=1:inf %iteration
-    %w1=w1(n)+nu*e(n)*x1(n); 
-    %w2=w2(n)+nu*e(n)*x2(n);
-    %b=b+?;
-%   calculate output for current example
-   v=x1(?)*w1+x2(?)*w2+b;
-   disp(v);
-%   calculate error for current example
-   if v > 0
-       y = 1;
-   else
-       y = -1;
-   end
-   e=T(n)-y;
-   disp(e);
-%   update parameters using current inputs and current error
- 	w1 = w1+nu*e*x1(1);
-    disp(w1);
-   w2 = w2+nu*e*x2(1);
-    disp(w2);
-   b = b+nu*e*1;
-    disp(b);
-% 
-%   Test how good are updated parameters (weights) on all examples used for training
-%   calculate outputs and errors for all 5 examples using current values of the parameter set {w1, w2, b}
-%   calculate 'v1', 'v2', 'v3',... 'v5'
-% 
-%   calculate 'y1', ..., 'y5'
-%     
-%   calculate 'e1', ... 'e5'
+    for m=1:5 % 1 to 5 matrix for x1/x2
+        
+    %new inputs
+    %w1(n+1)=w1(n)+eta*e(n)*x1(m);
+    %w2(n+1)=w2(n)+eta*e(n)*x2(m);
+    %b(n+1)=b(n)+eta*e(n);
     
-	% calculate the total error for these 5 inputs 
-%!	e = abs(e1) + abs(e2) + abs(e3) + abs(e4) + abs(e5);
+%   calculate output for current example
+    v=x1(m)*w1+x2(m)*w2+b;
+    disp(v);
+   
+%   calculate error for current example
+
+    if v > 0
+        y = 1;
+    else
+        y = -1;
     end
+    e=T(m)-y;
+    disp(e);
+
+%   update parameters using current inputs and current error
+    w1 = w1+eta*e*x1(m);
+    %!w1(n+1)=w1(n)+eta*e(n)*x1(n);
+    disp(w1);
+    
+    w2 = w2+eta*e*x2(m);
+    %!w2(n+1)=w2(n)+eta*e(n)*x2(n);
+    disp(w2);
+    
+    b = b+eta*e*1;
+    %!b(n+1)=b(n)+eta*e(n)*1;
+    disp(b);
+
+    end
+    %Out of loop test
+    %1
+    for m=1:5
+    v=x1(m)*w1+x2(m)*w2+b;
+    if v>0
+        y=1;
+    else
+        y=-1;
+    end
+    E(m)=T(m)-y;
+    e = e+abs(E(m));
+    disp("error1");
+    disp(e);
+    end
+end
+
+ for j=1:5
+    v=z1(j)*w1+z2(j)*w2+b;
+    if v>0
+        y=1;
+    else
+        y=-1;
+    end
+    G(j)=T(j)-y;
+    e = e+abs(G(j));
+    disp("error2");
+    disp(e);
 end
